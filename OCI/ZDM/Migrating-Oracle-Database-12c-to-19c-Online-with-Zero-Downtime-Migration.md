@@ -33,7 +33,7 @@ Before embarking on your ZDM migration journey, several prerequisites must be me
         * SQL*Net (Port 1521, 2484(ADB Dedicated), or SCAN Listener Port TCP): From the ZDM host to the source and target database servers for logical migrations.  
         * SQL*Net (Ports 1521, 1522, 2484, or user-defined TCP/TCPS): From the GoldenGate hub to the source and target database servers [Implied GoldenGate requirement].  
         * HTTPS (Port 443 SSL): From the ZDM host to the GoldenGate hub for REST API calls, and from the ZDM host and/or source/target servers to OCI REST endpoints (Core, IAM, Database, Object Storage).  
-    6. **User Access and Authentication**: 
+    6. **User Access and Authentication** :   
         * The zdmuser on the ZDM host needs SSH key-based access to the source and target database servers. This can be as user with sudo privileges.  
         * For logical migration, connecting as the Oracle software owner (dbuser) is supported for source and target by setting RUNCPATREMOTELY to TRUE [F.123, Implied usage].  
         * SSH keys should be set up without a passphrase.  
@@ -43,3 +43,17 @@ Before embarking on your ZDM migration journey, several prerequisites must be me
         * DBLINK: Supported for online/offline to all targets, but not recommended for very large databases. Requires direct network connectivity. Can be created by ZDM if it doesn't exist.  
         * NFS/FSS: Supported, including for migrations to ADB@Customer. Requires NFS/FSS setup and mount points.  
         * COPY: Secure copy method supported for co-managed and user-managed targets. Requires Port 22 connectivity to the target storage server.  
+
+## Preparing the Migration Plan with the Response File
+ZDM jobs are configured using a response file (zdm_template.rsp). You'll need to populate this file with parameters specific to your environment and migration type.  
+### Key parameters for a 12c to 19c online logical migration include:
+    • MIGRATION_METHOD=ONLINE_LOGICAL.
+    • DATA_TRANSFER_MEDIUM: Choose your data transfer method (e.g., OSS, DBLINK, NFS).
+    • Source Database Details: SOURCEDATABASE_ADMINUSERNAME, SOURCEDATABASE_CONNECTIONDETAILS_HOST, SOURCEDATABASE_CONNECTIONDETAILS_PORT, SOURCEDATABASE_CONNECTIONDETAILS_SERVICENAME, SOURCEDATABASE_ENVIRONMENT_NAME=ORACLE , SOURCEDATABASE_ENVIRONMENT_DBTYPE . If source is ADB, use SOURCEDATABASE_OCID . Include SOURCEDATABASE_GGADMINUSERNAME for GoldenGate .
+    • Target Database Details: TARGETDATABASE_ADMINUSERNAME . If targeting OCI Cloud database (non-ADB), use TARGETDATABASE_OCID . If targeting ADB and not providing OCID, along with connection details (TARGETDATABASE_CONNECTIONDETAILS_HOST, _PORT, _SERVICENAME). Include TARGETDATABASE_GGADMINUSERNAME for GoldenGate .
+    • GoldenGate Details: GOLDENGATEHUB_ADMINUSERNAME, GOLDENGATEHUB_SOURCEDEPLOYMENTNAME, GOLDENGATEHUB_TARGETDEPLOYMENTNAME.
+    • Authentication Parameters: These are typically provided via command-line arguments like -srcauth, -tgtauth specifying zdmauth or dbuser and the identity file/sudo location.
+    • Data Pump Settings: Parameters like DATAPUMPSETTINGS_EXPORTVERSION, DATAPUMPSETTINGS_DATAPUMPPARAMETERS_EXPORTPARALLELISMDEGREE, DATAPUMPSETTINGS_DATAPUMPPARAMETERS_IMPORTPARALLELISMDEGREE, DATAPUMPSETTINGS_RETAINDUMPS, DATAPUMPSETTINGS_DELETEDUMPSINOSS, DATAPUMPSETTINGS_FIXINVALIDOBJECTS, INCLUDEOBJECTS-LIST_ELEMENT_NUMBER or EXCLUDEOBJECTS-LIST_ELEMENT_NUMBER if migrating specific schemas, DATAPUMPSETTINGS_METADATAREMAPS-LIST_ELEMENT_NUMBER.
+    • Data Transfer Settings: Relevant DUMPTRANSFERDETAILS_* parameters based on your chosen medium (e.g., DUMPTRANSFERDETAILS_SOURCE_OCIWALLETLOC for OSS over HTTPS, DUMPTRANSFERDETAILS_PUBLICREAD for NFS dumps).
+    • Flashback: Control flashback on the target using FLASHBACK_ON.
+    • Source Shutdown: Optionally configure source shutdown after migration with SHUTDOWN_SRC.
