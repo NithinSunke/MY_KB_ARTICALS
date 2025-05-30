@@ -5,7 +5,7 @@
 
 ## Introduction
 Migrating production databases is a critical task, often complicated by the need to minimize disruption to business operations. Oracle Zero Downtime Migration (ZDM) is a powerful tool designed to address this challenge, offering robust, flexible, and resumable methods to move Oracle databases to Oracle Cloud or Exadata environments with minimal downtime.
-This post focuses on migrating from an Oracle Database 12c (specifically supported versions like 12.1.0.2 or 12.2.0.1) to a target Oracle Database 19c, using ZDM's Logical Online Migrationapproach. 
+This post focuses on migrating from an Oracle Database 12c (specifically supported versions like 12.1.0.2 or 12.2.0.1) to a target Oracle Database 19c, using ZDM's Logical Online Migration approach. 
 This method is ideal for keeping your source database available during most of the migration process, leveraging Oracle Data Pump for the initial data transfer and Oracle GoldenGate for ongoing replication.
 
 ## Understanding Logical Online Migration
@@ -35,9 +35,9 @@ Before embarking on your ZDM migration journey, several prerequisites must be me
         * HTTPS (Port 443 SSL): From the ZDM host to the GoldenGate hub for REST API calls, and from the ZDM host and/or source/target servers to OCI REST endpoints (Core, IAM, Database, Object Storage).  
     6. **User Access and Authentication** :   
         * The zdmuser on the ZDM host needs SSH key-based access to the source and target database servers. This can be as user with sudo privileges.  
-        * For logical migration, connecting as the Oracle software owner (dbuser) is supported for source and target by setting RUNCPATREMOTELY to TRUE [F.123, Implied usage].  
+        * For logical migration, connecting as the Oracle software owner (dbuser) is supported for source and target by setting RUNCPATREMOTELY to TRUE.  
         * SSH keys should be set up without a passphrase.  
-        * Credentials can be provided interactively or stored in wallets for non-interactive runs. Wallet parameters like WALLET_OGGADMIN , WALLET_SOURCEADMIN [G.50], WALLET_TARGETADMIN [G.51] are used.  
+        * Credentials can be provided interactively or stored in wallets for non-interactive runs. Wallet parameters like WALLET_OGGADMIN , WALLET_SOURCEADMIN , WALLET_TARGETADMIN  are used.  
     7. **Data Transfer Medium**: For logical migrations, supported media include Object Storage (OSS), NFS, Database Link (DBLINK), COPY, and AMAZONS3 (if source is AWS RDS).   
         * OSS: A common choice for Cloud targets. Requires Port 443 connectivity. May require SSL wallet configuration on the source for HTTPS access using DUMPTRANSFERDETAILS_SOURCE_OCIWALLETLOC. Using OCI CLI for dump transfer with OSS is recommended for speed and resilience, requiring OCI CLI installation and configuration.  
         * DBLINK: Supported for online/offline to all targets, but not recommended for very large databases. Requires direct network connectivity. Can be created by ZDM if it doesn't exist.  
@@ -57,3 +57,58 @@ ZDM jobs are configured using a response file (zdm_template.rsp). You'll need to
     • Data Transfer Settings: Relevant DUMPTRANSFERDETAILS_* parameters based on your chosen medium (e.g., DUMPTRANSFERDETAILS_SOURCE_OCIWALLETLOC for OSS over HTTPS, DUMPTRANSFERDETAILS_PUBLICREAD for NFS dumps).
     • Flashback: Control flashback on the target using FLASHBACK_ON.
     • Source Shutdown: Optionally configure source shutdown after migration with SHUTDOWN_SRC.
+
+## Crucial First Step: Run CPAT  
+Before initiating the migration, you must run the Cloud Premigration Advisor Tool (CPAT)using ZDM. CPAT analyses your source database for potential migration issues and suitability for the target environment. Run the ZDMCLI command with the -eval -advisor options: 
+```
+zdmuser> $ZDM_HOME/bin/zdmcli migrate database -rsp /path/to/your/response_file.rsp \
+-sourcedb your_source_db_name -sourcenode source_host \
+-targetnode target_host \
+-srcauth zdmauth -srcarg1 user:opc -srcarg2 identity_file:/home/zdmuser/.ssh/id_rsa.pub -srcarg3 sudo_location:/usr/bin/sudo \
+-tgtauth zdmauth -tgtarg1 user:opc -tgtarg2 identity_file:/home/zdmuser/.ssh/id_rsa.pub -tgtarg3 sudo_location:/usr/bin/sudo \
+-eval -advisor
+```
+Address any errors or action required items reported by CPAT before proceeding.
+
+## Executing the Migration Job  
+Once prerequisites are met and the response file is prepared, execute the migration using the zdmcli migrate database command:  
+```
+zdmuser> $ZDM_HOME/bin/zdmcli migrate database -rsp /path/to/your/response_file.rsp \
+-sourcedb your_source_db_unique_name -sourcenode source_host \
+-targetnode target_host \
+-srcauth zdmauth -srcarg1 user:opc -srcarg2 identity_file:/home/zdmuser/.ssh/zdm_service_host.ppk -srcarg3 sudo_location:/usr/bin/sudo \
+-tgtauth zdmauth -tgtarg1 user:opc -tgtarg2 identity_file:/home/zdmuser/.ssh/zdm_service_host.ppk -tgtarg3 sudo_location:/usr/bin/sudo \
+-schedule NOW
+```  
+You can use the -schedule NOW option to start immediately or For example, 2016-12-21T19:13:17+05 . The command output will provide a job ID.  
+For logical online migrations, it's often advisable to use the -pauseafter option after the GoldenGate replication setup and monitoring phases are complete. This allows you to manually perform the application switchover before resuming the ZDM job.  
+
+## Monitoring the Migration  
+Monitor the migration job status using the job ID obtained after execution:  
+```
+zdmuser> $ZDM_HOME/bin/zdmcli query job -jobid <your_job_id>
+```
+You can view the phases of the job using zdmcli migrate database -listphases. Key phases for logical online migration include:  
+    • ZDM_PREPARE_DATAPUMP_SRC: Prepares for Data Pump export on the source.  
+    • ZDM_DATAPUMP_EXPORT_SRC: Starts and monitors Data Pump export.  
+    • ZDM_UPLOAD_DUMPS_SRC: Uploads dump files to OSS or transfers via other media if not DBLINK.  
+    • ZDM_DATAPUMP_IMPORT_TGT: Imports data to the target.  
+    • ZDM_PREPARE_GG_HUB: Registers database connection details with GoldenGate Microservices.  
+    • ZDM_START_GG_EXTRACT_SRC: Starts the GoldenGate Extract process on the source.  
+    • ZDM_START_GG_REPLICAT_TGT: Starts the GoldenGate Replicat process on the target.  
+    • ZDM_MONITOR_GG_LAG: Monitors the GoldenGate replication lag.  
+    • ZDM_SWITCHOVER_APP: The phase where application switchover typically happens (often manual).  
+
+When using zdmcli query job, you can also see GoldenGate metrics like extract/replicat status and end-to-end heartbeat lag once the relevant phases are completed.
+
+## Application Switchover and Post-Migration  
+As mentioned, the actual application switchover is usually a manual step in logical online migration. After ZDM has established GoldenGate replication and the lag is minimal (monitored via ZDM_MONITOR_GG_LAG), you would:  
+    1. Stop application connections to the source database.  
+    2. Wait for GoldenGate to apply any remaining changes, ensuring the target is fully synchronised.  
+    3. Redirect your applications to connect to the new 19c target database.  
+    4. If you paused the ZDM job (e.g., with -pauseafter ZDM_MONITOR_GG_LAG), resume it using zdmcli resume job -jobid <your_job_id>.  
+ZDM handles post-migration cleanup tasks like fixing invalid objects or removing temporary credentials/DBLinks. You can also configure parameters like SHUTDOWN_SRC to shut down the source database if desired.  
+
+## Conclusion
+Migrating your Oracle Database 12c to 19c online using Zero Downtime Migration provides a powerful, automated way to achieve your database modernisation goals with minimal impact on your users and business operations. The Logical Online Migration method, leveraging Data Pump and GoldenGate, ensures your source database remains available throughout most of the process.
+Always refer to the official Oracle documentation for the most current and detailed information on ZDM prerequisites, parameter definitions, and troubleshooting, as the information herein is subject to change.
