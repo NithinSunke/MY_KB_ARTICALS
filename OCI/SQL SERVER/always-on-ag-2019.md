@@ -136,6 +136,7 @@ to make the ip address static reserve the ip address
 For this example I have created a jump host vm(windows) in public network and did rdp from there
 
 From the Jump Box vm RDP to Domain Controller Server  
+<p>&nbsp;</p>
 <img src="./images/AG20.png" alt="Description" width="600"/> 
 <img src="./images/AG21.png" alt="Description" width="600"/>   
 Enable the administrator account and set password   
