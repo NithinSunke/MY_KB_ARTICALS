@@ -217,3 +217,359 @@ Active Directory Users and Computers
 
 <p>&nbsp;</p>
 <img src="./images/AG69.png" alt="Description" width="600"/>
+
+## Sql server nodes setup
+Provision two window 2019 server nodes to setup always on AG.  
+As we deployed domain controler same deploy two vms sqlsrv01, sqlsrv02  and Join the sql server to domain controler.  
+<p>&nbsp;</p>
+<img src="./images/AG70.png" alt="Description" width="600"/>
+<img src="./images/AG71.png" alt="Description" width="600"/>
+<img src="./images/AG72.png" alt="Description" width="600"/>
+<img src="./images/AG73.png" alt="Description" width="600"/>
+<img src="./images/AG74.png" alt="Description" width="600"/>
+<img src="./images/AG75.png" alt="Description" width="600"/>
+<p>&nbsp;</p>
+
+Login as administration  
+Open computer management:  
+<p>&nbsp;</p>
+<img src="./images/AG76.png" alt="Description" width="600"/>
+<img src="./images/AG77.png" alt="Description" width="600"/>
+
+Logout and login as your user  
+<img src="./images/AG78.png" alt="Description" width="600"/>
+<p>&nbsp;</p>
+Attach secound IP's for Failover Cluster and AG listener.  
+In oci console on sql node1 attach two secoundary ip's to vnic.    
+<p>&nbsp;</p>
+<img src="./images/AG79.png" alt="Description" width="600"/>
+<img src="./images/AG80.png" alt="Description" width="600"/>
+<img src="./images/AG81.png" alt="Description" width="600"/>
+<img src="./images/AG82.png" alt="Description" width="600"/>
+<p>&nbsp;</p>
+Repeat same steps to Configure secoundary ip addres on SQL Node2.
+<p>&nbsp;</p>  
+
+## CONFIGURE FILE SHARE WITNESS Quorum
+In a Windows Failover Cluster, quorum determines the number of elements that must be online for the cluster to remain operational. For a 2-node cluster (like most SQL Server Always On AG setups in OCI or on-prem), adding a File Share Witness (FSW) is highly recommended to avoid split-brain scenarios and ensure high availability.
+### Prerequisites
+*	A third server (e.g., Domain Controller or utility VM) that both SQL nodes can access.
+*	The SQL nodes and the witness server must be in the same Active Directory domain.
+*	You must have Failover Clustering feature installed on SQL nodes.
+
+For this tutorial am using DC as quorum server  
+<img src="./images/AG83.png" alt="Description" width="600"/>
+<img src="./images/AG84.png" alt="Description" width="500"/>
+<img src="./images/AG85.png" alt="Description" width="400"/>
+<img src="./images/AG86.png" alt="Description" width="500"/>
+<img src="./images/AG87.png" alt="Description" width="500"/>
+<img src="./images/AG88.png" alt="Description" width="500"/>
+
+**Share Location** : \\OCISQLDC01\Quorum
+<p>&nbsp;</p>
+<img src="./images/AG89.png" alt="Description" width="500"/>
+ 
+ Login to sql server  nodes and validate the access of share  
+ Example: on sqlserver node1 try to access the share
+ <img src="./images/AG90.png" alt="Description" width="500"/>
+<p>&nbsp;</p>
+Create a AGshare to sync the secoundry replica during inital setting of AG.
+<p>&nbsp;</p>
+ <img src="./images/AG91.png" alt="Description" width="500"/>
+
+**AGShare Location** : \\OCISQLDC01\AGshare
+
+## Install sql server 2019:
+
+Before proceed with installation configure the necessary storage on all sql server nodes
+
+Add block volumes for data, logs, temp for all the nodes
+* Data volume 50gb
+* Log volume 50gb
+* Temp volume 50gb
+
+For OCI Console under storage section select block volumes and create necessary block volumes.
+ <img src="./images/AG92.png" alt="Description" width="500"/>
+
+> Create storage under same AD i.e: AD-2 in over case where the vm is provisioned.  
+
+ <img src="./images/AG93.png" alt="Description" width="500"/>
+Make other option default and create block volume
+<p>&nbsp;</p>
+ <img src="./images/AG94.png" alt="Description" width="500"/>
+Repeat same for log and tempfile block volumes
+<p>&nbsp;</p>
+ <img src="./images/AG95.png" alt="Description" width="500"/>
+
+Now add the block volumes to sqlserver node1
+<img src="./images/AG96.png" alt="Description" width="500"/>
+<img src="./images/AG97.png" alt="Description" width="500"/>
+<img src="./images/AG98.png" alt="Description" width="500"/>
+Keep remaining options default.  
+<img src="./images/AG99.png" alt="Description" width="500"/>
+Attach other two block volumes using same steps:
+<img src="./images/AG100.png" alt="Description" width="500"/>
+
+Repeat same steps to node2 also First create block volumes.
+<img src="./images/AG101.png" alt="Description" width="500"/>
+Attach them to sqlsrv02
+<img src="./images/AG102.png" alt="Description" width="500"/>
+
+### Initialize disks:
+
+<img src="./images/AG103.png" alt="Description" width="500"/>
+<img src="./images/AG104.png" alt="Description" width="500"/>
+<img src="./images/AG105.png" alt="Description" width="500"/>
+<img src="./images/AG106.png" alt="Description" width="500"/>
+<img src="./images/AG107.png" alt="Description" width="500"/>
+<img src="./images/AG108.png" alt="Description" width="500"/>
+<img src="./images/AG109.png" alt="Description" width="500"/>
+<img src="./images/AG110.png" alt="Description" width="500"/>
+<img src="./images/AG111.png" alt="Description" width="500"/>
+<img src="./images/AG112.png" alt="Description" width="500"/>
+Repeat same for logs and tempfiles:
+<img src="./images/AG113.png" alt="Description" width="500"/>
+Repeat same on sql server node2
+<img src="./images/AG114.png" alt="Description" width="500"/>
+<p>&nbsp;</p>  
+
+[Download sql server 2019](https://www.microsoft.com/en-us/evalcenter/download-sql-server-2019)
+
+<img src="./images/AG115.png" alt="Description" width="500"/>
+<p>&nbsp;</p>  
+<img src="./images/AG116.png" alt="Description" width="500"/>
+<p>&nbsp;</p>  
+
+### Installation steps
+<img src="./images/AG117.png" alt="Description" width="500"/>
+<p>&nbsp;</p>  
+<img src="./images/AG118.png" alt="Description" width="500"/>
+<p>&nbsp;</p>  
+<img src="./images/AG119.png" alt="Description" width="500"/>
+<p>&nbsp;</p>  
+<img src="./images/AG120.png" alt="Description" width="500"/>
+<p>&nbsp;</p>  
+<img src="./images/AG121.png" alt="Description" width="500"/>
+<p>&nbsp;</p>  
+<img src="./images/AG122.png" alt="Description" width="500"/>
+<p>&nbsp;</p>  
+<img src="./images/AG123.png" alt="Description" width="500"/>
+<p>&nbsp;</p>  
+<img src="./images/AG124.png" alt="Description" width="500"/>
+<p>&nbsp;</p>  
+<img src="./images/AG125.png" alt="Description" width="500"/>
+<p>&nbsp;</p>  
+<img src="./images/AG126.png" alt="Description" width="500"/>
+<p>&nbsp;</p>  
+<img src="./images/AG127.png" alt="Description" width="500"/>
+<p>&nbsp;</p>  
+<img src="./images/AG128.png" alt="Description" width="500"/>
+<p>&nbsp;</p>  
+<img src="./images/AG129.png" alt="Description" width="500"/>
+<p>&nbsp;</p>  
+<img src="./images/AG130.png" alt="Description" width="500"/>
+<p>&nbsp;</p>  
+<img src="./images/AG131.png" alt="Description" width="500"/>
+<p>&nbsp;</p>  
+<img src="./images/AG132.png" alt="Description" width="500"/>
+<p>&nbsp;</p>  
+<img src="./images/AG133.png" alt="Description" width="500"/>
+<p>&nbsp;</p>  
+<img src="./images/AG134.png" alt="Description" width="500"/>
+<p>&nbsp;</p>  
+<img src="./images/AG135.png" alt="Description" width="500"/>
+<p>&nbsp;</p>  
+<img src="./images/AG136.png" alt="Description" width="500"/>
+<p>&nbsp;</p>  
+<img src="./images/AG137.png" alt="Description" width="500"/>
+<p>&nbsp;</p>  
+<img src="./images/AG138.png" alt="Description" width="500"/>
+<p>&nbsp;</p>  
+<img src="./images/AG139.png" alt="Description" width="500"/>
+<p>&nbsp;</p>  
+Proceed with next
+<img src="./images/AG140.png" alt="Description" width="500"/>
+<p>&nbsp;</p>  
+Create the Directory Structure at OS level.  
+<img src="./images/AG141.png" alt="Description" width="500"/>
+<img src="./images/AG142.png" alt="Description" width="500"/>
+<img src="./images/AG143.png" alt="Description" width="500"/>
+<img src="./images/AG144.png" alt="Description" width="500"/>
+<img src="./images/AG145.png" alt="Description" width="500"/>
+<img src="./images/AG146.png" alt="Description" width="500"/>
+<img src="./images/AG147.png" alt="Description" width="500"/>
+
+Repeat same steps on node2.  
+
+Install ssms on sqlserver optional  
+Install ssms on jump server
+
+<img src="./images/AG148.png" alt="Description" width="500"/>
+<img src="./images/AG1_1.png" alt="Description" width="500"/>
+Run the setupfile
+<img src="./images/AG149.png" alt="Description" width="500"/>
+<img src="./images/AG150.png" alt="Description" width="500"/>
+<img src="./images/AG151.png" alt="Description" width="500"/>
+<img src="./images/AG152.png" alt="Description" width="500"/>
+<img src="./images/AG153.png" alt="Description" width="500"/>
+<img src="./images/AG154.png" alt="Description" width="500"/>
+<img src="./images/AG155.png" alt="Description" width="500"/>
+<img src="./images/AG156.png" alt="Description" width="500"/>
+<img src="./images/AG157.png" alt="Description" width="500"/>
+<img src="./images/AG158.png" alt="Description" width="500"/>
+<img src="./images/AG159.png" alt="Description" width="500"/>
+
+## Download sample database
+
+[Download sample database from here](https://github.com/Microsoft/sql-server-samples/releases/tag/wide-world-importers-v1.0)
+<p>&nbsp;</p>  
+<img src="./images/AG160.png" alt="Description" width="500"/>
+<img src="./images/AG161.png" alt="Description" width="500"/>
+<img src="./images/AG162.png" alt="Description" width="500"/>
+<img src="./images/AG163.png" alt="Description" width="500"/>
+<img src="./images/AG164.png" alt="Description" width="500"/>
+<img src="./images/AG165.png" alt="Description" width="500"/>
+<img src="./images/AG166.png" alt="Description" width="500"/>
+
+## Install WINDOWS SERVER FAILOVER CLUSTER
+<img src="./images/AG167.png" alt="Description" width="500"/>
+<img src="./images/AG168.png" alt="Description" width="500"/>
+<img src="./images/AG169.png" alt="Description" width="500"/>
+<img src="./images/AG170.png" alt="Description" width="500"/>
+<img src="./images/AG171.png" alt="Description" width="500"/>
+<img src="./images/AG172.png" alt="Description" width="500"/>
+<img src="./images/AG173.png" alt="Description" width="500"/>
+Repeat same steps on node2 to install windows failover cluster.
+<p>&nbsp;</p>  
+<img src="./images/AG174.png" alt="Description" width="500"/>
+<img src="./images/AG175.png" alt="Description" width="500"/>
+<img src="./images/AG176.png" alt="Description" width="500"/>
+<img src="./images/AG177.png" alt="Description" width="500"/>
+<img src="./images/AG178.png" alt="Description" width="500"/>
+<img src="./images/AG179.png" alt="Description" width="500"/>
+<img src="./images/AG180.png" alt="Description" width="500"/>
+<img src="./images/AG181.png" alt="Description" width="500"/>
+<img src="./images/AG182.png" alt="Description" width="500"/>
+<img src="./images/AG183.png" alt="Description" width="500"/>
+<img src="./images/AG184.png" alt="Description" width="500"/>
+<img src="./images/AG185.png" alt="Description" width="500"/>
+<img src="./images/AG186.png" alt="Description" width="500"/>
+<img src="./images/AG187.png" alt="Description" width="500"/>
+<img src="./images/AG188.png" alt="Description" width="500"/>
+<img src="./images/AG189.png" alt="Description" width="500"/>
+<img src="./images/AG190.png" alt="Description" width="500"/>
+
+On node 2 open failover cluster
+<img src="./images/AG191.png" alt="Description" width="500"/>
+<img src="./images/AG192.png" alt="Description" width="500"/>
+<img src="./images/AG193.png" alt="Description" width="500"/>
+<img src="./images/AG194.png" alt="Description" width="500"/>
+<img src="./images/AG195.png" alt="Description" width="500"/>
+<img src="./images/AG196.png" alt="Description" width="500"/>
+<img src="./images/AG197.png" alt="Description" width="500"/>
+<img src="./images/AG198.png" alt="Description" width="500"/>
+<img src="./images/AG199.png" alt="Description" width="500"/>
+
+Notice that the status of the cluster is **Offline in Cluster Core Resources** section. Expand the resources and find the cluster IP addresses not yet configured. We will do it in a few steps from now.
+
+<img src="./images/AG200.png" alt="Description" width="500"/>
+
+We will associate the IPs created  to the cluster. This will bring the cluster up and make it operational. On the **Failover Cluster Manager**, expand the **Cluster Core Resources** and right-click on the IP address with **Failed** status and then click **Properties**.
+
+<img src="./images/AG201.png" alt="Description" width="500"/>
+<img src="./images/AG202.png" alt="Description" width="500"/>
+<img src="./images/AG203.png" alt="Description" width="500"/>
+<img src="./images/AG204.png" alt="Description" width="500"/>
+
+### Grant permissions to the Cluster Domain Computer Object
+<img src="./images/AG205.png" alt="Description" width="500"/>
+<img src="./images/AG206.png" alt="Description" width="500"/>
+<img src="./images/AG207.png" alt="Description" width="500"/>
+<img src="./images/AG208.png" alt="Description" width="500"/>
+<img src="./images/AG209.png" alt="Description" width="500"/>
+<img src="./images/AG210.png" alt="Description" width="500"/>
+<img src="./images/AG211.png" alt="Description" width="500"/>
+<img src="./images/AG212.png" alt="Description" width="500"/>
+<img src="./images/AG213.png" alt="Description" width="500"/>
+
+## Enable always on  high availability feature 
+<img src="./images/AG214.png" alt="Description" width="500"/>
+
+Select  SQL Server 2019 Configuration Manger
+
+<img src="./images/AG215.png" alt="Description" width="500"/>
+<img src="./images/AG216.png" alt="Description" width="500"/>
+<img src="./images/AG217.png" alt="Description" width="500"/>
+
+Restart 
+
+<img src="./images/AG218.png" alt="Description" width="500"/>
+
+Repeat same steps on all the nodes  
+Modify the recovery model to Full
+<img src="./images/AG219.png" alt="Description" width="500"/>
+<img src="./images/AG220.png" alt="Description" width="500"/>
+
+Take backup of database on primary replica
+<img src="./images/AG221.png" alt="Description" width="500"/>
+<img src="./images/AG222.png" alt="Description" width="500"/>
+<img src="./images/AG223.png" alt="Description" width="500"/>
+<img src="./images/AG224.png" alt="Description" width="500"/>
+<img src="./images/AG225.png" alt="Description" width="500"/>
+<img src="./images/AG226.png" alt="Description" width="500"/>
+<img src="./images/AG227.png" alt="Description" width="500"/>
+<img src="./images/AG228.png" alt="Description" width="500"/>
+<img src="./images/AG229.png" alt="Description" width="500"/>
+<img src="./images/AG230.png" alt="Description" width="500"/>
+<img src="./images/AG231.png" alt="Description" width="500"/>
+<img src="./images/AG232.png" alt="Description" width="500"/>
+<img src="./images/AG233.png" alt="Description" width="500"/>
+<img src="./images/AG234.png" alt="Description" width="500"/>
+<img src="./images/AG235.png" alt="Description" width="500"/>
+<img src="./images/AG236.png" alt="Description" width="500"/>
+<img src="./images/AG237.png" alt="Description" width="500"/>
+<img src="./images/AG238.png" alt="Description" width="500"/>
+<img src="./images/AG239.png" alt="Description" width="500"/>
+<img src="./images/AG240.png" alt="Description" width="500"/>
+<img src="./images/AG241.png" alt="Description" width="500"/>
+<img src="./images/AG242.png" alt="Description" width="500"/>
+<img src="./images/AG243.png" alt="Description" width="500"/>
+<img src="./images/AG244.png" alt="Description" width="500"/>
+<img src="./images/AG245.png" alt="Description" width="500"/>
+
+
+## Enable always on  high availability feature 
+<img src="./images/AG246.png" alt="Description" width="500"/>
+<img src="./images/AG247.png" alt="Description" width="500"/>
+<img src="./images/AG248.png" alt="Description" width="500"/>
+<img src="./images/AG249.png" alt="Description" width="500"/>
+
+Restart sql server
+<img src="./images/AG250.png" alt="Description" width="500"/>
+<img src="./images/AG251.png" alt="Description" width="500"/>
+<img src="./images/AG252.png" alt="Description" width="500"/>
+<img src="./images/AG253.png" alt="Description" width="500"/>
+<img src="./images/AG254.png" alt="Description" width="500"/>
+<img src="./images/AG255.png" alt="Description" width="500"/>
+<img src="./images/AG256.png" alt="Description" width="500"/>
+<img src="./images/AG257.png" alt="Description" width="500"/>
+<img src="./images/AG258.png" alt="Description" width="500"/>
+<img src="./images/AG259.png" alt="Description" width="500"/>
+<img src="./images/AG260.png" alt="Description" width="500"/>
+<img src="./images/AG261.png" alt="Description" width="500"/>
+<img src="./images/AG262.png" alt="Description" width="500"/>
+<img src="./images/AG263.png" alt="Description" width="500"/>
+<img src="./images/AG264.png" alt="Description" width="500"/>
+<img src="./images/AG265.png" alt="Description" width="500"/>
+<img src="./images/AG266.png" alt="Description" width="500"/>
+<img src="./images/AG267.png" alt="Description" width="500"/>
+<img src="./images/AG268.png" alt="Description" width="500"/>
+<img src="./images/AG269.png" alt="Description" width="500"/>
+<img src="./images/AG270.png" alt="Description" width="500"/>
+<img src="./images/AG271.png" alt="Description" width="500"/>
+<img src="./images/AG272.png" alt="Description" width="500"/>
+<img src="./images/AG273.png" alt="Description" width="500"/>
+<img src="./images/AG274.png" alt="Description" width="500"/>
+
+## Conclusion
+Setting up SQL Server 2019 Always On Availability Groups on Oracle Cloud Infrastructure ensures that your databases are highly available, fault-tolerant, and ready for mission-critical workloads. With native support for multi-subnet architectures and integrated cloud networking, OCI is a strong foundation for SQL Server HA/DR architectures.
