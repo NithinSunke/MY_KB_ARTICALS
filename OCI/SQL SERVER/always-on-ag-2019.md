@@ -459,7 +459,7 @@ Repeat same steps on node2 to install windows failover cluster.
 <img src="./images/AG189.png" alt="Description" width="500"/>
 <img src="./images/AG190.png" alt="Description" width="500"/>
 
-On node 2 open failover cluster
+On node 2 open failover cluster  
 <img src="./images/AG191.png" alt="Description" width="500"/>
 <img src="./images/AG192.png" alt="Description" width="500"/>
 <img src="./images/AG193.png" alt="Description" width="500"/>
