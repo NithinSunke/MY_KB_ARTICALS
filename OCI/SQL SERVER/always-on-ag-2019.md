@@ -310,7 +310,7 @@ Keep remaining options default.
 Attach other two block volumes using same steps:  
 <img src="./images/AG100.png" alt="Description" width="500"/>  
 
-Repeat same steps to node2 also First create block volumes.
+Repeat same steps to node2 also First create block volumes.  
 <img src="./images/AG101.png" alt="Description" width="500"/>  
 Attach them to sqlsrv02  
 <img src="./images/AG102.png" alt="Description" width="500"/>  
@@ -510,7 +510,7 @@ Modify the recovery model to Full
 <img src="./images/AG219.png" alt="Description" width="500"/>  
 <img src="./images/AG220.png" alt="Description" width="500"/>  
 
-Take backup of database on primary replica
+Take backup of database on primary replica  
 <img src="./images/AG221.png" alt="Description" width="500"/>  
 <img src="./images/AG222.png" alt="Description" width="500"/>  
 <img src="./images/AG223.png" alt="Description" width="500"/>  
