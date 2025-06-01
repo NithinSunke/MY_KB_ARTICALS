@@ -270,7 +270,7 @@ For this tutorial am using DC as quorum server
 <img src="./images/AG89.png" alt="Description" width="500"/>
  
  Login to sql server  nodes and validate the access of share  
- Example: on sqlserver node1 try to access the share
+ Example: on sqlserver node1 try to access the share  
  <img src="./images/AG90.png" alt="Description" width="500"/>
 <p>&nbsp;</p>
 Create a AGshare to sync the secoundry replica during inital setting of AG.
@@ -301,19 +301,19 @@ Repeat same for log and tempfile block volumes
 <p>&nbsp;</p>
  <img src="./images/AG95.png" alt="Description" width="500"/>
 
-Now add the block volumes to sqlserver node1
-<img src="./images/AG96.png" alt="Description" width="500"/>
-<img src="./images/AG97.png" alt="Description" width="500"/>
-<img src="./images/AG98.png" alt="Description" width="500"/>
+Now add the block volumes to sqlserver node1  
+<img src="./images/AG96.png" alt="Description" width="500"/>  
+<img src="./images/AG97.png" alt="Description" width="500"/>  
+<img src="./images/AG98.png" alt="Description" width="500"/>  
 Keep remaining options default.  
-<img src="./images/AG99.png" alt="Description" width="500"/>
-Attach other two block volumes using same steps:
-<img src="./images/AG100.png" alt="Description" width="500"/>
+<img src="./images/AG99.png" alt="Description" width="500"/>  
+Attach other two block volumes using same steps:  
+<img src="./images/AG100.png" alt="Description" width="500"/>  
 
 Repeat same steps to node2 also First create block volumes.
-<img src="./images/AG101.png" alt="Description" width="500"/>
-Attach them to sqlsrv02
-<img src="./images/AG102.png" alt="Description" width="500"/>
+<img src="./images/AG101.png" alt="Description" width="500"/>  
+Attach them to sqlsrv02  
+<img src="./images/AG102.png" alt="Description" width="500"/>  
 
 ### Initialize disks:
 
@@ -460,15 +460,15 @@ Repeat same steps on node2 to install windows failover cluster.
 <img src="./images/AG190.png" alt="Description" width="500"/>
 
 On node 2 open failover cluster  
-<img src="./images/AG191.png" alt="Description" width="500"/>
-<img src="./images/AG192.png" alt="Description" width="500"/>
-<img src="./images/AG193.png" alt="Description" width="500"/>
-<img src="./images/AG194.png" alt="Description" width="500"/>
-<img src="./images/AG195.png" alt="Description" width="500"/>
-<img src="./images/AG196.png" alt="Description" width="500"/>
-<img src="./images/AG197.png" alt="Description" width="500"/>
-<img src="./images/AG198.png" alt="Description" width="500"/>
-<img src="./images/AG199.png" alt="Description" width="500"/>
+<img src="./images/AG191.png" alt="Description" width="500"/>  
+<img src="./images/AG192.png" alt="Description" width="500"/>  
+<img src="./images/AG193.png" alt="Description" width="500"/>  
+<img src="./images/AG194.png" alt="Description" width="500"/>  
+<img src="./images/AG195.png" alt="Description" width="500"/>  
+<img src="./images/AG196.png" alt="Description" width="500"/>  
+<img src="./images/AG197.png" alt="Description" width="500"/>  
+<img src="./images/AG198.png" alt="Description" width="500"/>  
+<img src="./images/AG199.png" alt="Description" width="500"/>  
 
 Notice that the status of the cluster is **Offline in Cluster Core Resources** section. Expand the resources and find the cluster IP addresses not yet configured. We will do it in a few steps from now.
 
@@ -506,70 +506,70 @@ Restart
 <img src="./images/AG218.png" alt="Description" width="500"/>
 
 Repeat same steps on all the nodes  
-Modify the recovery model to Full
-<img src="./images/AG219.png" alt="Description" width="500"/>
-<img src="./images/AG220.png" alt="Description" width="500"/>
+Modify the recovery model to Full  
+<img src="./images/AG219.png" alt="Description" width="500"/>  
+<img src="./images/AG220.png" alt="Description" width="500"/>  
 
 Take backup of database on primary replica
-<img src="./images/AG221.png" alt="Description" width="500"/>
-<img src="./images/AG222.png" alt="Description" width="500"/>
-<img src="./images/AG223.png" alt="Description" width="500"/>
-<img src="./images/AG224.png" alt="Description" width="500"/>
-<img src="./images/AG225.png" alt="Description" width="500"/>
-<img src="./images/AG226.png" alt="Description" width="500"/>
-<img src="./images/AG227.png" alt="Description" width="500"/>
-<img src="./images/AG228.png" alt="Description" width="500"/>
-<img src="./images/AG229.png" alt="Description" width="500"/>
-<img src="./images/AG230.png" alt="Description" width="500"/>
-<img src="./images/AG231.png" alt="Description" width="500"/>
-<img src="./images/AG232.png" alt="Description" width="500"/>
-<img src="./images/AG233.png" alt="Description" width="500"/>
-<img src="./images/AG234.png" alt="Description" width="500"/>
-<img src="./images/AG235.png" alt="Description" width="500"/>
-<img src="./images/AG236.png" alt="Description" width="500"/>
-<img src="./images/AG237.png" alt="Description" width="500"/>
-<img src="./images/AG238.png" alt="Description" width="500"/>
-<img src="./images/AG239.png" alt="Description" width="500"/>
-<img src="./images/AG240.png" alt="Description" width="500"/>
-<img src="./images/AG241.png" alt="Description" width="500"/>
-<img src="./images/AG242.png" alt="Description" width="500"/>
-<img src="./images/AG243.png" alt="Description" width="500"/>
-<img src="./images/AG244.png" alt="Description" width="500"/>
-<img src="./images/AG245.png" alt="Description" width="500"/>
+<img src="./images/AG221.png" alt="Description" width="500"/>  
+<img src="./images/AG222.png" alt="Description" width="500"/>  
+<img src="./images/AG223.png" alt="Description" width="500"/>  
+<img src="./images/AG224.png" alt="Description" width="500"/>  
+<img src="./images/AG225.png" alt="Description" width="500"/>  
+<img src="./images/AG226.png" alt="Description" width="500"/>  
+<img src="./images/AG227.png" alt="Description" width="500"/>  
+<img src="./images/AG228.png" alt="Description" width="500"/>  
+<img src="./images/AG229.png" alt="Description" width="500"/>  
+<img src="./images/AG230.png" alt="Description" width="500"/>  
+<img src="./images/AG231.png" alt="Description" width="500"/>  
+<img src="./images/AG232.png" alt="Description" width="500"/>  
+<img src="./images/AG233.png" alt="Description" width="500"/>  
+<img src="./images/AG234.png" alt="Description" width="500"/>  
+<img src="./images/AG235.png" alt="Description" width="500"/>  
+<img src="./images/AG236.png" alt="Description" width="500"/>  
+<img src="./images/AG237.png" alt="Description" width="500"/>  
+<img src="./images/AG238.png" alt="Description" width="500"/>  
+<img src="./images/AG239.png" alt="Description" width="500"/>  
+<img src="./images/AG240.png" alt="Description" width="500"/>  
+<img src="./images/AG241.png" alt="Description" width="500"/>  
+<img src="./images/AG242.png" alt="Description" width="500"/>  
+<img src="./images/AG243.png" alt="Description" width="500"/>  
+<img src="./images/AG244.png" alt="Description" width="500"/>  
+<img src="./images/AG245.png" alt="Description" width="500"/>  
 
 
-## Enable always on  high availability feature 
-<img src="./images/AG246.png" alt="Description" width="500"/>
-<img src="./images/AG247.png" alt="Description" width="500"/>
-<img src="./images/AG248.png" alt="Description" width="500"/>
-<img src="./images/AG249.png" alt="Description" width="500"/>
+## Enable always on  high availability feature   
+<img src="./images/AG246.png" alt="Description" width="500"/>  
+<img src="./images/AG247.png" alt="Description" width="500"/>  
+<img src="./images/AG248.png" alt="Description" width="500"/>  
+<img src="./images/AG249.png" alt="Description" width="500"/>  
 
-Restart sql server
-<img src="./images/AG250.png" alt="Description" width="500"/>
-<img src="./images/AG251.png" alt="Description" width="500"/>
-<img src="./images/AG252.png" alt="Description" width="500"/>
-<img src="./images/AG253.png" alt="Description" width="500"/>
-<img src="./images/AG254.png" alt="Description" width="500"/>
-<img src="./images/AG255.png" alt="Description" width="500"/>
-<img src="./images/AG256.png" alt="Description" width="500"/>
-<img src="./images/AG257.png" alt="Description" width="500"/>
-<img src="./images/AG258.png" alt="Description" width="500"/>
-<img src="./images/AG259.png" alt="Description" width="500"/>
-<img src="./images/AG260.png" alt="Description" width="500"/>
-<img src="./images/AG261.png" alt="Description" width="500"/>
-<img src="./images/AG262.png" alt="Description" width="500"/>
-<img src="./images/AG263.png" alt="Description" width="500"/>
-<img src="./images/AG264.png" alt="Description" width="500"/>
-<img src="./images/AG265.png" alt="Description" width="500"/>
-<img src="./images/AG266.png" alt="Description" width="500"/>
-<img src="./images/AG267.png" alt="Description" width="500"/>
-<img src="./images/AG268.png" alt="Description" width="500"/>
-<img src="./images/AG269.png" alt="Description" width="500"/>
-<img src="./images/AG270.png" alt="Description" width="500"/>
-<img src="./images/AG271.png" alt="Description" width="500"/>
-<img src="./images/AG272.png" alt="Description" width="500"/>
-<img src="./images/AG273.png" alt="Description" width="500"/>
-<img src="./images/AG274.png" alt="Description" width="500"/>
+Restart sql server  
+<img src="./images/AG250.png" alt="Description" width="500"/>  
+<img src="./images/AG251.png" alt="Description" width="500"/>  
+<img src="./images/AG252.png" alt="Description" width="500"/>  
+<img src="./images/AG253.png" alt="Description" width="500"/>  
+<img src="./images/AG254.png" alt="Description" width="500"/>  
+<img src="./images/AG255.png" alt="Description" width="500"/>  
+<img src="./images/AG256.png" alt="Description" width="500"/>  
+<img src="./images/AG257.png" alt="Description" width="500"/>  
+<img src="./images/AG258.png" alt="Description" width="500"/>  
+<img src="./images/AG259.png" alt="Description" width="500"/>  
+<img src="./images/AG260.png" alt="Description" width="500"/>  
+<img src="./images/AG261.png" alt="Description" width="500"/>  
+<img src="./images/AG262.png" alt="Description" width="500"/>  
+<img src="./images/AG263.png" alt="Description" width="500"/>  
+<img src="./images/AG264.png" alt="Description" width="500"/>  
+<img src="./images/AG265.png" alt="Description" width="500"/>  
+<img src="./images/AG266.png" alt="Description" width="500"/>  
+<img src="./images/AG267.png" alt="Description" width="500"/>  
+<img src="./images/AG268.png" alt="Description" width="500"/>  
+<img src="./images/AG269.png" alt="Description" width="500"/>  
+<img src="./images/AG270.png" alt="Description" width="500"/>  
+<img src="./images/AG271.png" alt="Description" width="500"/>  
+<img src="./images/AG272.png" alt="Description" width="500"/>  
+<img src="./images/AG273.png" alt="Description" width="500"/>  
+<img src="./images/AG274.png" alt="Description" width="500"/>  
 
 ## Conclusion
 Setting up SQL Server 2019 Always On Availability Groups on Oracle Cloud Infrastructure ensures that your databases are highly available, fault-tolerant, and ready for mission-critical workloads. With native support for multi-subnet architectures and integrated cloud networking, OCI is a strong foundation for SQL Server HA/DR architectures.
