@@ -258,12 +258,12 @@ In a Windows Failover Cluster, quorum determines the number of elements that mus
 *	You must have Failover Clustering feature installed on SQL nodes.
 
 For this tutorial am using DC as quorum server  
-<img src="./images/AG83.png" alt="Description" width="600"/>
-<img src="./images/AG84.png" alt="Description" width="500"/>
-<img src="./images/AG85.png" alt="Description" width="400"/>
-<img src="./images/AG86.png" alt="Description" width="500"/>
-<img src="./images/AG87.png" alt="Description" width="500"/>
-<img src="./images/AG88.png" alt="Description" width="500"/>
+<img src="./images/AG83.png" alt="Description" width="600"/>  
+<img src="./images/AG84.png" alt="Description" width="500"/>  
+<img src="./images/AG85.png" alt="Description" width="400"/>  
+<img src="./images/AG86.png" alt="Description" width="500"/>  
+<img src="./images/AG87.png" alt="Description" width="500"/>  
+<img src="./images/AG88.png" alt="Description" width="500"/>  
 
 **Share Location** : \\OCISQLDC01\Quorum
 <p>&nbsp;</p>
