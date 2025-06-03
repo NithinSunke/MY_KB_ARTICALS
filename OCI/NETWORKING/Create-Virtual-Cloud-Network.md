@@ -31,11 +31,11 @@ Networking > Virtual Cloud Networks
 * Click the Create Virtual Cloud Network button.
 ![](./images/vcn3.jpg)
 
-### Step 4: Enter Basic Details
-Name: Enter a friendly name for your VCN (e.g., IN-VCN).
-Compartment: Select the compartment where you want to create the VCN.
-CIDR Block: Specify the IPv4 CIDR block for your VCN (e.g., 10.0.0.0/16). This defines the IP address range available within your network.
-DNS Label: Specify the DNS Label (e.g., scslabs)
+### Step 4: Enter Basic Details  
+Name: Enter a friendly name for your VCN (e.g., IN-VCN).  
+Compartment: Select the compartment where you want to create the VCN.  
+CIDR Block: Specify the IPv4 CIDR block for your VCN (e.g., 10.0.0.0/16). This defines the IP address range available within your network.  
+DNS Label: Specify the DNS Label (e.g., scslabs)  
 
 ### Step 5: Create the VCN
 Click Create Virtual Cloud Network.
