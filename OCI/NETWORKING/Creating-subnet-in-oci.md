@@ -5,6 +5,8 @@ When building a cloud network in Oracle Cloud Infrastructure (OCI), subnets are 
 
 This Blog dives into what subnets are, the types of subnets available in OCI, and when to use them.
 
+<img src="./images/vcn16.jpg" alt="Description" width="600"/>  
+
 ## What is a Subnet?
 A subnet (sub-network) is a logical subdivision of an IP network. In OCI, subnets are used to divide a VCN’s IP address space into smaller chunks, each acting like a small network where resources like compute instances, databases, and load balancers can be deployed.
 
