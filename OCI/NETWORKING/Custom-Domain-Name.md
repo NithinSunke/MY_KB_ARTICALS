@@ -45,7 +45,7 @@ Oracle Cloud Infrastructure provides Private DNS Zones which allow you to overri
       <img src="./images/dns05.jpg" alt="Description" width="600"/>   
       <img src="./images/dns06.jpg" alt="Description" width="600"/>  
       once the records are added you will see them as below  
-      <img src="./images/dns07.jpg" alt="Description" width="600"/>  
+      <img src="./images/dns07.jpg" alt="Description" width="600"/>   
       review changes and publish changes  
       <img src="./images/dns08.jpg" alt="Description" width="600"/>  
 
@@ -53,11 +53,11 @@ Oracle Cloud Infrastructure provides Private DNS Zones which allow you to overri
     Ensure each VCN uses the custom zone for resolution:
     1.  Go to VCNs → syd-vcn → DNS Resolver  
     <img src="./images/dns09.jpg" alt="Description" width="600"/>  
-    1.  Click on Associated private views -> Manage private views
-    <img src="./images/dns10.jpg" alt="Description" width="600"/>   
-    1.  Add another private view and select the private view that is associate with private zone.
+    1.  Click on Associated private views -> Manage private views  
+    <img src="./images/dns10.jpg" alt="Description" width="600"/>  
+    1.  Add another private view and select the private view that is associate with private zone.  
     <img src="./images/dns11.jpg" alt="Description" width="600"/>  
-    <img src="./images/dns12.jpg" alt="Description" width="600"/> 
+    <img src="./images/dns12.jpg" alt="Description" width="600"/>  
 
     **Repeat for scs-syd-vcn**  
     Also ensure that "Enable DNS Hostnames" is checked on the subnet level if needed.
