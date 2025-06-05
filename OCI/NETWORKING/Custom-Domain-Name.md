@@ -86,4 +86,4 @@ You should see responses from the private IP addresses, confirming that DNS reso
 |:------------|:---------------|
 |🔐 Use Private Zones Only	|Keep internal names hidden from the public|
 |📒 Consistent Naming |	Follow naming conventions |
-|🧪 Test Before Scaling	Confirm DNS works before deploying apps|
+|🧪 Test Before Scaling	|Confirm DNS works before deploying apps|
