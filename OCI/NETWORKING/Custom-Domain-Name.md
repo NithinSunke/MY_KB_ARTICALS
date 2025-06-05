@@ -44,8 +44,10 @@ Oracle Cloud Infrastructure provides Private DNS Zones which allow you to overri
     2.  Example for VM1:  
       <img src="./images/dns05.jpg" alt="Description" width="600"/>   
       <img src="./images/dns06.jpg" alt="Description" width="600"/>  
+
       once the records are added you will see them as below  
       <img src="./images/dns07.jpg" alt="Description" width="600"/>   
+      
       review changes and publish changes  
       <img src="./images/dns08.jpg" alt="Description" width="600"/>  
 
