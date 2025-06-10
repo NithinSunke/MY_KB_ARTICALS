@@ -1,0 +1,91 @@
+# Cross-Region VCN Peering in Oracle Cloud Infrastructure (OCI)
+## Introduction
+As organizations adopt multi-region cloud architectures for high availability and disaster recovery, connecting networks across regions becomes essential. Oracle Cloud Infrastructure (OCI) supports Cross-Region Virtual Cloud Network (VCN) Peering using Dynamic Routing Gateways (DRG) to enable private, secure communication between VCNs in different regions.
+
+In this blog, we’ll walk through the steps to set up Cross-Region VCN Peering in OCI, enabling seamless communication between workloads hosted in different regions.
+
+## Use Case
+You're running workloads in two regions:
+- swtrl-vcn1 in switerland
+- abu-vcn1 in abu bhabi
+
+> **Goal**: Enable private IP-based communication between these VCNs without using the public internet.
+
+## Prerequisites
+Before you begin:
+*   Two VCNs in different regions (with non-overlapping CIDR blocks)
+*   OCI user with appropriate IAM policies
+*   Basic understanding of OCI Networking (VCNs, subnets, route tables)
+
+### Step-by-Step Setup
+#### Step 1: Create DRGs in Both Regions
+Navigate to each region and:
+*   Go to Networking > Dynamic Routing Gateways.
+*   Click Create DRG.
+*   Name them (e.g., DRG-STRL, DRG-ABU) and click Create.
+
+<img src="./images/DRG1.jpg" alt="Description" width="600"/>  
+<img src="./images/DRG2.jpg" alt="Description" width="600"/>  
+
+#### Step 2: Attach Each DRG to Its VCN
+For each DRG:
+1.  Go to the VCN → Dynamic Routing Gateways
+2.  Click Attach DRG
+    -   Select the DRG you created
+    -   Click Attach  
+<img src="./images/drg3.jpg" alt="Description" width="600"/>  
+<img src="./images/drg4.jpg" alt="Description" width="600"/>  
+
+#### Step 3: Create Remote Peering Connection (RPC)
+Do this for both DRGs:
+1.  Go to DRG Details → Remote Peering Connections
+2.  Click Create Remote Peering Connection
+    1.  Name: RPC-SWTL  and RPC-ABU 
+3.  Save the RPC  
+<img src="./images/drg5.jpg" alt="Description" width="600"/>  
+<img src="./images/drg6.jpg" alt="Description" width="600"/>  
+
+#### Step 4: Establish Peering Between RPCs
+Go to one DRG’s RPC (e.g., RPC-SWTL) and click Establish Peering:
+1.  Choose RPC in another region
+2.  Select the region 
+3.  provide the target RPC ocid (RPC-ABU)
+4.  Click Establish Peering
+
+<img src="./images/drg7.jpg" alt="Description" width="600"/>  
+<img src="./images/drg8.jpg" alt="Description" width="600"/>  
+<img src="./images/drg9.jpg" alt="Description" width="600"/>  
+<img src="./images/drg10.jpg" alt="Description" width="600"/>  
+
+
+#### Step 5: Update Route Tables in Both VCNs
+Update the Route Table for each subnet that needs to communicate across regions:
+VCN-A Route Table (switzerland)
+*   Destination: 10.1.0.0/16
+*   Target Type: Dynamic Routing Gateway
+*   Target: DRG-STRL  
+<img src="./images/drg11.jpg" alt="Description" width="600"/> 
+
+VCN-B Route Table (Abu dabhi)
+*   Destination: 10.0.0.0/16  or only the subnet cidr range(10.0.2.0/24)
+*   Target Type: Dynamic Routing Gateway
+*   Target: DRG-ABU  
+<img src="./images/drg12.jpg" alt="Description" width="600"/> 
+
+
+#### Step 6: Update Security Lists or NSGs
+Make sure Security Lists (or NSGs) allow ingress/egress for the remote CIDR ranges:
+Example for VCN-A:
+```    
+    Ingress Rule: Source 10.1.0.0/16 → Allow TCP/ICMP
+    Egress Rule: Destination 10.1.0.0/16 → Allow TCP/ICMP
+```
+Repeat similarly for VCN-B.
+
+eg:  
+<img src="./images/drg13.jpg" alt="Description" width="600"/> 
+
+#### Testing
+Launch VMs in both regions in the subnets.
+Ping each other using private IPs.
+Ensure firewall and OS-level rules allow communication.

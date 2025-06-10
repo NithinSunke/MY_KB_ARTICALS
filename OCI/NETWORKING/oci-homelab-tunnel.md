@@ -1,202 +1,221 @@
-# Step-by-Step WireGuard VPN Setup (Oracle Linux 8 Server + Homelab Client)
+To create a **site-to-site VPN using WireGuard** between your homelab (behind double NAT) and an **Oracle Cloud Infrastructure (OCI)** instance, you'll use a **reverse connection** technique. Here's a complete, detailed guide covering:
 
-## Part 1: Setup WireGuard Server on Oracle Linux 8 (OCI)
-### Step 1: Install WireGuard
-Oracle Linux 8 supports WireGuard via EPEL repository.
-```
+* WireGuard installation
+* Configuration (keys, peers, etc.)
+* NAT forwarding
+* firewalld configuration
+* OCI security list rules
+
+---
+
+## ✅ Topology Recap
+
+| Component            | IP Address                                      | OS             | Role                    |
+| -------------------- | ----------------------------------------------- | -------------- | ----------------------- |
+| Homelab WireGuard VM | `192.168.1.31`                                  | Oracle Linux 8 | Client (behind CG-NAT)  |
+| OCI WireGuard VM     | `10.0.1.230` (private), `152.67.74.55` (public) | Oracle Linux 9 | Server (relay endpoint) |
+
+---
+
+## 🛠 Step-by-Step Setup
+
+### Step 1: Install WireGuard on Both VMs
+
+**On both VMs (OEL8 and OEL9):**
+
+```bash
 sudo dnf install -y epel-release
-sudo dnf install -y wireguard-tools 
+sudo dnf install -y wireguard-tools
 ```
-To confirm WireGuard is working:
-```
-which wg
-which wg-quick
-```
-Then try:
-```
+
+Verify installation:
+
+```bash
 wg --version
 ```
-If those work, your installation is successful.
 
+---
 
-### Step 2: Enable IP Forwarding
-Enable IP forwarding so your VPN server can route packets between VPN clients and OCI resources.
-```
-sudo sysctl -w net.ipv4.ip_forward=1
-echo "net.ipv4.ip_forward=1" | sudo tee -a /etc/sysctl.conf
-```
+### Step 2: Generate WireGuard Keys
 
-### Step 3: Generate Server Keys
-```
+**On both VMs:**
+
+```bash
 umask 077
-wg genkey | tee server_private.key | wg pubkey > server_public.key
+wg genkey | tee privatekey | wg pubkey > publickey
 ```
 
-### Step 4: Create WireGuard Config File /etc/wireguard/wg0.conf
-```
+* You'll use these in the next steps.
+* Save the keys:
+
+  * `homelab_private`, `homelab_public`
+  * `oci_private`, `oci_public`
+
+---
+
+### Step 3: Configure WireGuard Interfaces
+
+#### 🖥 OCI VM (Act as relay server)
+
+Edit `/etc/wireguard/wg0.conf`:
+
+```ini
 [Interface]
-PrivateKey = CGsxczNFNH8q9GQ1L1hQsNJhmdgSLvpZX6FcpBvkc28=
-Address = 10.100.0.1/24
+PrivateKey = <oci_private>
+Address = 10.100.100.1/24
 ListenPort = 51820
+SaveConfig = true
 
 [Peer]
-PublicKey = <homelab_public_key>
-AllowedIPs = 10.100.0.2/32
-
+PublicKey = <homelab_public>
+AllowedIPs = 10.100.100.2/32, 192.168.1.0/24
 ```
-* Replace <server_private_key> with the content of server_private.key.
-* <homelab_public_key> will be generated on your homelab client.
 
-### Step 5: Configure Firewall and OCI Security Lists
-* Allow UDP port 51820 in Oracle Linux firewall:
-```
-sudo firewall-cmd --add-port=51820/udp --permanent
-sudo firewall-cmd --reload
-```
-* In OCI Console, update VCN subnet security list or Network Security Group to allow inbound UDP 51820 to this VM.
+Enable IP forwarding:
 
-<img src="./images/vpn1.jpg" alt="Description" width="800"/>  
-
-### Step 6: Start and Enable WireGuard Service
+```bash
+echo "net.ipv4.ip_forward=1" | sudo tee -a /etc/sysctl.conf
+sudo sysctl -p
 ```
+
+Start and enable WireGuard:
+
+```bash
 sudo systemctl enable wg-quick@wg0
 sudo systemctl start wg-quick@wg0
 ```
 
-## Part 2: Setup WireGuard Client on Homelab (Ubuntu / Oracle Linux / etc.)
+#### 🏠 Homelab VM (Acts as client)
 
-### Step 1: Install WireGuard
+Edit `/etc/wireguard/wg0.conf`:
 
-```
-sudo dnf install -y epel-release
-sudo dnf install -y wireguard-tools kmod-wireguard
-```
-
-### Step 2: Generate Client Keys
-```
-umask 077
-wg genkey | tee client_private.key | wg pubkey > client_public.key
-```
-
-### Step 3: Create Client Config /etc/wireguard/wg0.conf
-
-```
+```ini
 [Interface]
-PrivateKey = <client_private_key>
-Address = 10.100.0.2/32
+PrivateKey = <homelab_private>
+Address = 10.100.100.2/24
+DNS = 1.1.1.1
 
 [Peer]
-PublicKey = <server_public_key>
-Endpoint = <oci_public_ip>:51820
-AllowedIPs = 0.0.0.0/0
+PublicKey = <oci_public>
+Endpoint = 152.67.74.55:51820
+AllowedIPs = 10.0.1.0/24, 10.100.100.1/32
 PersistentKeepalive = 25
 ```
-* Replace <client_private_key> with content of client_private.key.
-* Replace <server_public_key> with content of server_public.key from server.
-* Replace <oci_public_ip> with your OCI VM’s public IP address.
-* AllowedIPs = 0.0.0.0/0 routes all traffic through the VPN. Adjust if you want selective routing.
-* PersistentKeepalive = 25 ensures NAT traversal works behind home NAT.
 
-### Step 4: Start and Enable WireGuard on Client
-```
+Start WireGuard:
+
+```bash
 sudo systemctl enable wg-quick@wg0
 sudo systemctl start wg-quick@wg0
 ```
 
-## Part 3: Verify Connectivity
+**Note:** Homelab initiates the connection using `PersistentKeepalive`.
 
-verify WireGuard Connectivity on homelab
-```
-wg show
+---
 
-output: 
-[root@wgclient ~]# wg show
-interface: wg0
-  public key: 4ci0Y6FmJWKgmVt5JRxiqznj1r3TehDqbILZ6GQ6NXc=
-  private key: (hidden)
-  listening port: 59893
-  fwmark: 0xca6c
+## 🔥 Configure firewalld (both VMs)
 
-peer: GyKAKVJ4o50adC2W3ye8tjQA/SEeJnr2D/8haw6+oUI=
-  endpoint: 159.13.33.185:51820
-  allowed ips: 0.0.0.0/0
-  latest handshake: 6 seconds ago
-  transfer: 92 B received, 328 B sent
-  persistent keepalive: every 25 seconds
-```
+### OCI VM (Server)
 
-verify WireGuard Connectivity on oci
-
-```
-[root@wgserver ~]# sudo wg show
-interface: wg0
-  public key: GyKAKVJ4o50adC2W3ye8tjQA/SEeJnr2D/8haw6+oUI=
-  private key: (hidden)
-  listening port: 51820
-
-peer: 4ci0Y6FmJWKgmVt5JRxiqznj1r3TehDqbILZ6GQ6NXc=
-  endpoint: 139.5.250.55:59893
-  allowed ips: 10.100.0.2/32
-  latest handshake: 32 seconds ago
-  transfer: 212 B received, 92 B sent
-```
-
-You should see:
-
-* Interface: wg0 with IP 10.100.0.2
-* Peer with public key of OCI server
-* And hopefully a latest handshake time
-
-from homelab
-ping 10.100.0.1
-
-from oci
-ping 10.100.0.2
-
-it should ping each other
-
-## Optional: Routing OCI Subnet via VPN
-If you want your homelab client to access OCI private subnets:
-* On server /etc/wireguard/wg0.conf, add:
-
-1. OCI WireGuard Server: /etc/wireguard/wg0.conf
-```
-[Interface]
-Address = 10.100.0.1/24
-PrivateKey = <OCI_PRIVATE_KEY>
-ListenPort = 51820
-
-# Enable IP forwarding and NAT
-PostUp = sysctl -w net.ipv4.ip_forward=1
-PostUp = iptables -t nat -A POSTROUTING -s 10.100.0.0/24 -d 172.16.0.0/16 -o eth0 -j MASQUERADE
-PostDown = iptables -t nat -D POSTROUTING -s 10.100.0.0/24 -d 172.16.0.0/16 -o eth0 -j MASQUERADE
-
-[Peer]
-PublicKey = <HOMELAB_PUBLIC_KEY>
-AllowedIPs = 10.100.0.2/32, 192.168.1.0/24
-```
-
-2. OCI Security List (VCN) & Firewalld Rules
-
-* In OCI Console > VCN > Subnet > Security List:
-    * Allow Ingress source: 10.100.0.0/24 all protocals.
-    * Allow Egress to 10.100.0.0/24.
-
-* On OCI VM (if firewalld is running):
-```
+```bash
 sudo firewall-cmd --permanent --add-port=51820/udp
-sudo firewall-cmd --permanent --add-rich-rule='rule family=ipv4 source address=10.100.0.0/24 accept'
+sudo firewall-cmd --permanent --add-masquerade
 sudo firewall-cmd --reload
 ```
-### Test Access
 
+Enable NAT for forwarding to OCI subnet:
+
+```bash
+sudo firewall-cmd --permanent --direct --add-rule ipv4 nat POSTROUTING 0 -s 10.100.100.0/24 -o ens3 -j MASQUERADE
+sudo firewall-cmd --reload
 ```
-# Start WireGuard
-sudo wg-quick up wg0
 
-# Test ping to OCI private instance
-ping 172.16.0.10
+(Assuming `ens3` is the OCI public NIC; confirm with `ip a`)
 
-# Or SSH
-ssh opc@172.16.0.10
-````
+### Homelab VM
+
+```bash
+sudo firewall-cmd --permanent --add-masquerade
+sudo firewall-cmd --reload
+```
+
+---
+
+## 🌐 OCI Security List Rules
+
+Go to **VCN > Subnet > Security Lists** and ensure:
+
+* **Ingress Rules**:
+
+  * Source: `0.0.0.0/0`, Protocol: `UDP`, Port: `51820`
+
+* **Egress Rules**:
+
+  * Destination: `0.0.0.0/0`, Protocol: `All`
+
+---
+
+## 🔄 Enable Routing/NAT
+
+### OCI VM
+
+Already enabled above (firewalld + IP forwarding).
+
+### Homelab VM
+
+If you want to allow LAN clients to reach OCI subnet:
+
+```bash
+echo "net.ipv4.ip_forward=1" | sudo tee -a /etc/sysctl.conf
+sudo sysctl -p
+
+sudo firewall-cmd --permanent --add-masquerade
+sudo firewall-cmd --reload
+```
+
+Forward traffic from LAN (192.168.1.0/24) via homelab WireGuard:
+
+```bash
+sudo firewall-cmd --permanent --direct --add-rule ipv4 nat POSTROUTING 0 -s 192.168.1.0/24 -o wg0 -j MASQUERADE
+sudo firewall-cmd --reload
+```
+
+---
+
+## ✅ Test Connectivity
+
+From **homelab WireGuard VM**:
+
+```bash
+ping 10.100.100.1     # OCI WG VM (VPN address)
+ping 10.0.1.230       # OCI private IP
+```
+
+From **OCI WireGuard VM**:
+
+```bash
+ping 10.100.100.2     # Homelab WG VM (VPN address)
+ping 192.168.1.1      # If LAN NAT routing is enabled
+```
+
+---
+
+## ✅ Optional: Static Routing on Clients
+
+To allow homelab clients to access OCI:
+
+* Set the **default gateway** or static route to `192.168.1.31` (the WireGuard VM).
+* Or use iptables to SNAT traffic as shown above.
+
+EG:
+ ### Method 1: Use nmcli (NetworkManager)
+If your system uses NetworkManager (most desktop Linux distros and recent RHEL-based systems):
+
+nmcli connection modify <connection-name> +ipv4.routes "10.0.1.0/24 192.168.1.31"
+nmcli connection up <connection-name>
+To find the connection name:
+nmcli connection show
+
+### For Windows Clients
+You can use route -p to make it persistent:
+route -p add 10.0.1.0 mask 255.255.255.0 192.168.1.31
