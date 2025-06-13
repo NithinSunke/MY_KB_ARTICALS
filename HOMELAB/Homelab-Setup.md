@@ -5,7 +5,7 @@ install vmware workstation
 install proxmox vm
 configure pangolin tunnel
 access resources using domain names publically
-
+install technitium dns for dns server
 
 
 
