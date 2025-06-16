@@ -134,11 +134,25 @@ FROM DISK = 'C:\Backups\YourDatabaseName.bak';
 SQL logins aren’t stored inside `.bak` files. Recreate them using this script on the source server:
 
 ```sql
-SELECT 'CREATE LOGIN [' + sp.name + '] WITH PASSWORD = ''' + 
-    CONVERT(VARCHAR(MAX), LOGINPROPERTY(sp.name, 'PasswordHash')) + ''', CHECK_POLICY = OFF;'
-FROM sys.sql_logins AS sp
-WHERE sp.name NOT IN ('sa');
+SELECT
+    'CREATE LOGIN [' + sp.name + '] WITH PASSWORD = ' +
+    CONVERT(VARCHAR(MAX), sl.password_hash, 1) + ' HASHED, CHECK_POLICY = ' +
+    CASE WHEN sl.is_policy_checked = 1 THEN 'ON' ELSE 'OFF' END + ';' AS CreateLoginScript
+FROM sys.server_principals sp
+JOIN sys.sql_logins sl ON sp.principal_id = sl.principal_id
+WHERE sp.type_desc = 'SQL_LOGIN'
+AND sp.name NOT IN ('sa');  -- Exclude 'sa' if you like
 ```
+
+
+```sql db users
+USE YourDatabaseName;
+SELECT name FROM sys.database_principals WHERE type IN ('S', 'U');
+```
+```sql Server-level login
+SELECT name FROM sys.server_principals WHERE type IN ('S', 'U');
+```
+
 
 Then run the generated `CREATE LOGIN` scripts on the OCI SQL Server.
 
@@ -146,16 +160,11 @@ Then run the generated `CREATE LOGIN` scripts on the OCI SQL Server.
 
 ---
 
+* **Use Case**: Small databases.
+* **Downtime**: Required (during backup & restore).
+
 ## 🚀 You're Done!
 
 You’ve successfully migrated your SQL Server instance to Oracle Cloud Infrastructure using the Backup and Restore method. This approach is especially effective for dev/test environments and simplifies DR test scenarios.
-
----
-
-## 🔗 Related Resources
-
-* [OCI Free Tier – Start with free compute](https://www.oracle.com/cloud/free/)
-* [How to Secure SQL Server in OCI](#)
-* [PowerShell Script for Backup/Restore Automation](#)
 
 ---
