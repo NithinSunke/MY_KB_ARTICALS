@@ -44,4 +44,4 @@ TASK [goldengate_install : Register Service Manager as a system service] *******
 changed: [192.168.1.22]
 
 PLAY RECAP ***********************************************************************************************************************************************************************************************************************
-192.168.1.22               : ok=0    changed=11    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+192.168.1.22               : ok=1    changed=11    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
