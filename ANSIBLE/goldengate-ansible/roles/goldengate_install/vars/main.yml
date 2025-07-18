@@ -1,0 +1,10 @@
+---
+ogg_user: oracle
+ogg_group: oinstall
+ogg_home: /u01/app/ogg23ai
+tmp_dir: /tmp/ogg_install
+oracle_base: /u01/app/oracle
+ogg_installer: V1042871-01.zip
+tns_admin: /u01/network/admin
+hostname: ogg23ai.scslabs.com
+oggca_response_file: /tmp/ogg_install/oggca.rsp

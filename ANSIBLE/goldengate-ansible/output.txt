@@ -1,0 +1,47 @@
+[ansadm@nsunke-65F3CY3 goldengate-ansible]$ ansible-playbook -i hosts.ini playbook.yml
+
+PLAY [Install Oracle GoldenGate 23ai using Ansible Roles] ***************************************************************************
+
+TASK [Gathering Facts] **************************************************************************************************************
+[WARNING]: Platform linux on host 192.168.1.22 is using the discovered Python interpreter at /usr/libexec/platform-python, but
+future installation of another Python interpreter could change this. See
+https://docs.ansible.com/ansible/2.9/reference_appendices/interpreter_discovery.html for more information.
+ok: [192.168.1.22]
+
+TASK [goldengate_install : Ensure group exists] *************************************************************************************
+changed: [192.168.1.22]
+
+TASK [goldengate_install : Create Oracle user] **************************************************************************************
+changed: [192.168.1.22]
+
+TASK [goldengate_install : Create required directories] *****************************************************************************
+changed: [192.168.1.22] => (item=/u01/app/ogg23ai)
+changed: [192.168.1.22] => (item=/tmp/ogg_install)
+changed: [192.168.1.22] => (item=/u01/app/oraInventory)
+
+TASK [goldengate_install : Install required packages] *******************************************************************************
+changed: [192.168.1.22]
+
+TASK [goldengate_install : Copy GoldenGate installer zip] ***************************************************************************
+changed: [192.168.1.22]
+
+TASK [goldengate_install : Unzip installer] *****************************************************************************************
+changed: [192.168.1.22]
+
+TASK [goldengate_install : Create response file from template] **********************************************************************
+changed: [192.168.1.22]
+
+TASK [goldengate_install : Install Oracle GoldenGate silently] **********************************************************************
+changed: [192.168.1.22]
+
+TASK [goldengate_install : Create oggca silent response file] ********************************************************************************************************************************************************************
+changed: [192.168.1.22]
+
+TASK [goldengate_install : Run OGGCA wizard in silent mode] **********************************************************************************************************************************************************************
+changed: [192.168.1.22]
+
+TASK [goldengate_install : Register Service Manager as a system service] *********************************************************************************************************************************************************
+changed: [192.168.1.22]
+
+PLAY RECAP ***********************************************************************************************************************************************************************************************************************
+192.168.1.22               : ok=0    changed=11    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0

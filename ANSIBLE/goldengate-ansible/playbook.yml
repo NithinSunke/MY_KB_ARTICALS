@@ -1,0 +1,6 @@
+---
+- name: Install Oracle GoldenGate 23ai using Ansible Roles
+  hosts: ogg
+  become: yes
+  roles:
+    - goldengate_install

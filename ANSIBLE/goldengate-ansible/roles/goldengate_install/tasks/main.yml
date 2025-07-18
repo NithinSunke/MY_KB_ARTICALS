@@ -1,0 +1,77 @@
+---
+- name: Ensure group exists
+  group:
+    name: "{{ ogg_group }}"
+    state: present
+
+- name: Create Oracle user
+  user:
+    name: "{{ ogg_user }}"
+    group: "{{ ogg_group }}"
+    shell: /bin/bash
+    home: "/home/{{ ogg_user }}"
+    state: present
+
+- name: Create required directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ ogg_user }}"
+    group: "{{ ogg_group }}"
+    mode: '0755'
+  loop:
+    - "{{ ogg_home }}"
+    - "{{ tmp_dir }}"
+    - "/u01/app/oraInventory"
+    - "/u01/app/sm_home"
+    - "/u01/app/dp_home"
+    - "/u01/app/metrics"
+
+- name: Install required packages
+  yum:
+    name:
+      - unzip
+      - libaio
+      - gcc
+    state: present
+
+- name: Copy GoldenGate installer zip
+  copy:
+    src: "{{ ogg_installer }}"
+    dest: "{{ tmp_dir }}/"
+    mode: '0644'
+
+- name: Unzip installer
+  unarchive:
+    src: "{{ tmp_dir }}/{{ ogg_installer }}"
+    dest: "{{ tmp_dir }}"
+    remote_src: yes
+- name: Create response file from template
+  template:
+    src: response.rsp.j2
+    dest: "{{ tmp_dir }}/response.rsp"
+    mode: '0644'
+- name: Install Oracle GoldenGate silently
+  command: >
+    ./runInstaller -silent -responseFile {{ tmp_dir }}/response.rsp -waitforcompletion
+  args:
+    chdir: "{{ tmp_dir }}/fbo_ggs_Linux_x64_Oracle_services_shiphome/Disk1"
+  become_user: "{{ ogg_user }}"
+- name: Create oggca silent response file
+  template:
+    src: oggca.rsp.j2
+    dest: "{{ oggca_response_file }}"
+    owner: "{{ ogg_user }}"
+    group: "{{ ogg_group }}"
+    mode: '0600'
+
+- name: Run OGGCA wizard in silent mode
+  command: >
+    ./oggca.sh -silent -nowait -responseFile {{ oggca_response_file }}
+  args:
+    chdir: "{{ ogg_home }}/bin"
+  become_user: "{{ ogg_user }}"
+
+- name: Register Service Manager as a system service
+  command: "/u01/app/sm_home/bin/registerServiceManager.sh"
+  become: yes
