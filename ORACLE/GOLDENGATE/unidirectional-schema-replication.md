@@ -101,3 +101,65 @@ validate schema trandata
 <img src="./images/gg27.jpg" alt="Description" width="600"/>
 
 ## create cdc extract
+<img src="./images/gg31.jpg" alt="Description" width="600"/>
+<img src="./images/gg32.jpg" alt="Description" width="600"/>
+<img src="./images/gg29.jpg" alt="Description" width="600"/>
+<img src="./images/gg30.jpg" alt="Description" width="600"/>
+<img src="./images/gg33.jpg" alt="Description" width="600"/>
+<img src="./images/gg34.jpg" alt="Description" width="600"/>  
+
+Start the extract  
+<img src="./images/gg35.jpg" alt="Description" width="600"/>  
+<img src="./images/gg36.jpg" alt="Description" width="600"/>  
+
+insert some records in to the replication tables.  
+you will see the captured rows in statistics  
+<img src="./images/gg37.jpg" alt="Description" width="1100"/>  
+
+## Create inital load extract
+which will perform the inital load 
+<img src="./images/gg38.jpg" alt="Description" width="1100"/>  
+create new inital load extract
+<img src="./images/gg39.jpg" alt="Description" width="1100"/> 
+<img src="./images/gg40.jpg" alt="Description" width="1100"/> 
+<img src="./images/gg41.jpg" alt="Description" width="1100"/>  
+once all the data is caputured the inital load extract will go down.  
+<img src="./images/gg42.jpg" alt="Description" width="1100"/> 
+
+
+Before inital load we need to create ddl of the tables which are part of replication.
+
+**create a checkpoint table.**
+<img src="./images/gg45.jpg" alt="Description" width="1100"/> 
+<img src="./images/gg46.jpg" alt="Description" width="1100"/> 
+
+## Create inital load replicate
+<img src="./images/gg43.jpg" alt="Description" width="1100"/> 
+<img src="./images/gg44.jpg" alt="Description" width="1100"/> 
+<img src="./images/gg45.jpg" alt="Description" width="1100"/> 
+<img src="./images/gg46.jpg" alt="Description" width="1100"/> 
+<img src="./images/gg47.jpg" alt="Description" width="1100"/> 
+<img src="./images/gg48.jpg" alt="Description" width="1100"/> 
+<img src="./images/gg49.jpg" alt="Description" width="1100"/> 
+<img src="./images/gg50.jpg" alt="Description" width="1100"/>  
+start the replicate.  
+<img src="./images/gg51.jpg" alt="Description" width="1100"/> 
+Validate the data at target.
+<img src="./images/gg52.jpg" alt="Description" width="1100"/> 
+once the count is matched with source stop the initial load replicate.  
+<img src="./images/gg53.jpg" alt="Description" width="1100"/> 
+
+## Create CDC replicate for Real time replication.
+<img src="./images/gg54.jpg" alt="Description" width="1100"/> 
+<img src="./images/gg55.jpg" alt="Description" width="1100"/> 
+<img src="./images/gg56.jpg" alt="Description" width="1100"/> 
+<img src="./images/gg57.jpg" alt="Description" width="1100"/> 
+<img src="./images/gg58.jpg" alt="Description" width="1100"/>
+
+**start the replicate**  
+to validate CDC replication we have inserted some rows at source and see those are replicated to target.  
+
+<img src="./images/gg59.jpg" alt="Description" width="1100"/> 
+<img src="./images/gg60.jpg" alt="Description" width="1100"/> 
+<img src="./images/gg61.jpg" alt="Description" width="1100"/> 
+<img src="./images/gg62.jpg" alt="Description" width="1100"/> 
