@@ -55,7 +55,7 @@ By default, GCP creates an **auto mode VPC** with pre-configured subnets for eac
 
 7. **Configure Additional Options (Optional)**
 
-   * Set `Private Google Access` if needed to avoid exposing resources to external network use this, it will not allocate public ip.
+   * Set `Private Google Access` 
    * Configure `Firewall Rules` (you can allow default rules or customize later).
 
 8. **Click “Create”**
