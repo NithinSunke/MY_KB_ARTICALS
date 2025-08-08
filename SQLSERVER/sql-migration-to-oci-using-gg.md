@@ -1,12 +1,3 @@
-Absolutely, Nithin! Below is your **complete step-by-step guide** to migrate your SQL Server database to **Oracle Cloud Infrastructure (OCI)** using:
-
-* 🧩 **BCP** for initial data load
-* 🔁 **Oracle GoldenGate (GG) Service** for real-time CDC (Change Data Capture)
-* ✅ Your tables: **17 system-versioned (base) tables** + **14 non-temporal tables**
-* ❌ **Excludes** history tables (automated and not required for GoldenGate)
-
----
-
 ## 🚀 GOAL:
 
 Migrate SQL Server database with **low downtime**, using BCP and GoldenGate.
